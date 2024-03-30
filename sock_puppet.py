@@ -1,3 +1,4 @@
+import json
 import random
 import string
 from datetime import datetime, timedelta
@@ -14,7 +15,7 @@ class SockPuppet:
         self.last_name = self.generate_last_name()
         self.date_of_birth = self.generate_date_of_birth()
         self.egn = self.generate_egn()
-        self.address = self.generate_address()
+        self.address, self.region = self.generate_address()
         self.phone_number = self.generate_phone_number()
         self.email = self.generate_email()
         self.username = self.generate_username()
@@ -26,6 +27,12 @@ class SockPuppet:
             strings = file.read().splitlines()
 
         return strings
+
+    def read_json_file(self, filename):
+        with open(filename, "r") as file:
+            data = json.load(file)
+            
+        return data
 
     def generate_first_name(self):
         if self.gender == "male":
@@ -57,18 +64,53 @@ class SockPuppet:
         year = self.date_of_birth[:4][-2:]
         month = self.date_of_birth[5:7]
         day = self.date_of_birth[8:10]
+        birthday = f"{year}{month}{day}"
 
-        random_digits = ''.join(random.choices(string.digits, k=4))
-        egn = f"{year}{month}{day}{random_digits}"
-        
+        region_start, region_end = self.region_codes
+        region_range = range(region_start, region_end)
+
+        while True:
+            if self.gender == "male":
+                possible_region_codes = [
+                    x for x in range(region_start, region_end) if x % 2 == 0
+                ]  # Even numbers for male
+            else:  # Female
+                possible_region_codes = [
+                    x for x in range(region_start, region_end) if x % 2 != 0
+                ]  # Odd numbers for female
+
+            region_code = random.choice(possible_region_codes)
+
+            # Generate the EGN
+            for check_num in range(0, 10):
+                egn = f"{birthday}{region_code:02d}{check_num}"
+
+                if self.validate_egn(egn):
+                    return egn
+
         return egn
 
+    def validate_egn(self, egn):
+        egn_weights = (2, 4, 8, 5, 10, 9, 7, 3, 6)
+        egn_sum = sum([weight * int(digit) for weight, digit in zip(egn_weights, egn)])
+        
+        return int(egn[-1]) == egn_sum % 11 % 10
+
     def generate_address(self):
-        cities = self.read_strings_from_file("./lists/cities.txt")
-        street_number = random.randint(1, 1000)
+        cities = self.read_json_file("./lists/cities.json")
         city = random.choice(cities)
 
-        return f"{street_number} {street_name}, {city}, {state} {zip_code}"
+        city_name = city["name"]
+        region_codes = city["codes"]
+        
+        streets = self.read_strings_from_file("./lists/streets.txt")
+        street = random.choice(streets)
+        street_number = random.randint(1, 1000)
+
+        return (
+            f"{city}, {street} {street_number}",
+            region_codes,
+        )
 
     def generate_phone_number(self):
         prefix = random.choice(["087", "088", "089"])
