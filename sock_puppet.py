@@ -22,31 +22,19 @@ class SockPuppet:
         self.password = self.generate_password()
         self.website_domain = self.generate_website_domain()
 
-    def read_strings_from_file(self, filename):
-        with open(filename, "r") as file:
-            strings = file.read().splitlines()
-
-        return strings
-
-    def read_json_file(self, filename):
-        with open(filename, "r") as file:
-            data = json.load(file)
-            
-        return data
-
     def generate_first_name(self):
         if self.gender == "male":
-            names = self.read_strings_from_file("./lists/male_first_names.txt")
+            names = self._read_strings_from_file("./lists/male_first_names.txt")
         else:
-            names = self.read_strings_from_file("./lists/female_first_names.txt")
+            names = self._read_strings_from_file("./lists/female_first_names.txt")
 
         return random.choice(names)
 
     def generate_last_name(self):
         if self.gender == "male":
-            names = self.read_strings_from_file("./lists/male_family_names.txt")
+            names = self._read_strings_from_file("./lists/male_family_names.txt")
         else:
-            names = self.read_strings_from_file("./lists/female_family_names.txt")
+            names = self._read_strings_from_file("./lists/female_family_names.txt")
 
         return random.choice(names)
 
@@ -85,25 +73,19 @@ class SockPuppet:
             for check_num in range(0, 10):
                 egn = f"{birthday}{region_code:02d}{check_num}"
 
-                if self.validate_egn(egn):
+                if self._validate_egn(egn):
                     return egn
 
         return egn
 
-    def validate_egn(self, egn):
-        egn_weights = (2, 4, 8, 5, 10, 9, 7, 3, 6)
-        egn_sum = sum([weight * int(digit) for weight, digit in zip(egn_weights, egn)])
-        
-        return int(egn[-1]) == egn_sum % 11 % 10
-
     def generate_address(self):
-        cities = self.read_json_file("./lists/cities.json")
+        cities = self._read_json_file("./lists/cities.json")
         city = random.choice(cities)
 
         city_name = city["name"]
         region_codes = city["codes"]
         
-        streets = self.read_strings_from_file("./lists/streets.txt")
+        streets = self._read_strings_from_file("./lists/streets.txt")
         street = random.choice(streets)
         street_number = random.randint(1, 1000)
 
@@ -132,10 +114,29 @@ class SockPuppet:
 
     def generate_password(self):
         characters = string.ascii_letters + string.digits + string.punctuation
+        
         return "".join(random.choices(characters, k=8))
 
     def generate_website_domain(self):
         return f"www.{random.choice(['example', 'test', 'demo'])}.{random.choice(['bg', 'eu', 'io', 'fun', 'store', 'com', 'net', 'org'])}"
+
+    def _validate_egn(self, egn):
+        egn_weights = (2, 4, 8, 5, 10, 9, 7, 3, 6)
+        egn_sum = sum([weight * int(digit) for weight, digit in zip(egn_weights, egn)])
+        
+        return int(egn[-1]) == egn_sum % 11 % 10
+    
+    def _read_strings_from_file(self, filename):
+        with open(filename, "r") as file:
+            strings = file.read().splitlines()
+
+        return strings
+
+    def _read_json_file(self, filename):
+        with open(filename, "r") as file:
+            data = json.load(file)
+            
+        return data
 
     def __str__(self):
         return f"Name: {self.first_name} {self.last_name}\nGender: {self.gender}\nDate of Birth: {self.date_of_birth}\nEGN: {self.egn}\nAddress: {self.address}\nPhone Number: {self.phone_number}\nEmail: {self.email}\nUsername: {self.username}\nPassword: {self.password}\nWebsite Domain: {self.website_domain}"
