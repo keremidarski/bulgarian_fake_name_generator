@@ -51,6 +51,16 @@ class SockPuppet:
 
         return dob.strftime("%Y-%m-%d")
 
+    def generate_egn(self):
+        year = self.date_of_birth[:4][-2:]
+        month = self.date_of_birth[5:7]
+        day = self.date_of_birth[8:10]
+
+        random_digits = ''.join(random.choices(string.digits, k=4))
+        egn = f"{year}{month}{day}{random_digits}"
+        
+        return egn
+
     def generate_address(self):
         cities = self.read_strings_from_file("./lists/cities.txt")
         street_number = random.randint(1, 1000)
@@ -84,4 +94,4 @@ class SockPuppet:
         return f"www.{random.choice(['example', 'test', 'demo'])}.{random.choice(['bg', 'eu', 'io', 'fun', 'store', 'com', 'net', 'org'])}"
 
     def __str__(self):
-        return f"Name: {self.first_name} {self.last_name}\nGender: {self.gender}\nDate of Birth: {self.date_of_birth}\nAddress: {self.address}\nPhone Number: {self.phone_number}\nEmail: {self.email}\nUsername: {self.username}\nPassword: {self.password}\nWebsite Domain: {self.website_domain}"
+        return f"Name: {self.first_name} {self.last_name}\nGender: {self.gender}\nDate of Birth: {self.date_of_birth}\nEGN: {self.egn}\nAddress: {self.address}\nPhone Number: {self.phone_number}\nEmail: {self.email}\nUsername: {self.username}\nPassword: {self.password}\nWebsite Domain: {self.website_domain}"
