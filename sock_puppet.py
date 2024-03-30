@@ -12,6 +12,8 @@ class SockPuppet:
 
         self.first_name = self.generate_first_name()
         self.last_name = self.generate_last_name()
+        self.date_of_birth = self.generate_date_of_birth()
+        self.egn = self.generate_egn()
         self.address = self.generate_address()
         self.phone_number = self.generate_phone_number()
         self.email = self.generate_email()
