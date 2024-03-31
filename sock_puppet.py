@@ -13,9 +13,9 @@ class SockPuppet:
 
         self.first_name = self.generate_first_name()
         self.last_name = self.generate_last_name()
-        self.date_of_birth, self.age, self.star_sign = self.generate_date_of_birth()
+        self.date_of_birth, self.bg_date_of_birth, self.age, self.star_sign = self.generate_date_of_birth()
+        self.address, self.region_codes = self.generate_address()
         self.egn = self.generate_egn()
-        self.address, self.region = self.generate_address()
         self.phone_number = self.generate_phone_number()
         self.email = self.generate_email()
         self.username = self.generate_username()
@@ -51,8 +51,11 @@ class SockPuppet:
 
         # Calculate star sign
         star_sign = self._get_star_sign(dob.month, dob.day)
+        
+        # Format date of birth in Bulgarian format
+        bg_date_of_birth = self._format_bg_date_of_birth(dob.day, dob.month, dob.year)
 
-        return dob.strftime("%Y-%m-%d"), age, star_sign
+        return dob.strftime("%Y-%m-%d"), bg_date_of_birth, age, star_sign
 
     def generate_egn(self):
         if int(self.date_of_birth[:4]) >= 2000:
@@ -142,9 +145,28 @@ class SockPuppet:
         egn_sum = sum([weight * int(digit) for weight, digit in zip(egn_weights, egn)])
 
         return int(egn[-1]) == egn_sum % 11 % 10
+    
+    def _format_bg_date_of_birth(self, day, month, year):
+        bg_month_names = {
+            1: "януари",
+            2: "февруари",
+            3: "март",
+            4: "април",
+            5: "май",
+            6: "юни",
+            7: "юли",
+            8: "август",
+            9: "септември",
+            10: "октомври",
+            11: "ноември",
+            12: "декември",
+        }
+
+        bg_date = f"{day} {bg_month_names[month]} {year}г."
+
+        return bg_date
 
     def _get_star_sign(self, month, day):
-        # Define star signs and their corresponding dates
         star_signs = [
             ("Козирог", (1, 1), (1, 19)),
             ("Водолей", (1, 20), (2, 18)),
@@ -161,22 +183,21 @@ class SockPuppet:
             ("Козирог", (12, 22), (12, 31)),
         ]
 
-        # Iterate through star signs to find the matching one
         for sign, start_date, end_date in star_signs:
             if (month, day) >= start_date and (month, day) <= end_date:
                 return sign
 
     def _read_strings_from_file(self, filename):
-        with open(filename, "r") as file:
+        with open(filename, "r", encoding="utf8") as file:
             strings = file.read().splitlines()
 
         return strings
 
     def _read_json_file(self, filename):
-        with open(filename, "r") as file:
+        with open(filename, "r", encoding="utf8") as file:
             data = json.load(file)
 
         return data
 
     def __str__(self):
-        return f"Name: {self.first_name} {self.last_name}\nGender: {self.gender}\nDate of Birth: {self.date_of_birth}\nAge: {self.age}\nStar Sign: {self.star_sign}\nEGN: {self.egn}\nAddress: {self.address}\nPhone Number: {self.phone_number}\nEmail: {self.email}\nUsername: {self.username}\nPassword: {self.password}\nWebsite Domain: {self.website_domain}"
+        return f"Име: {self.first_name} {self.last_name}\nПол: {self.gender}\nРожена дата: {self.bg_date_of_birth}\nВъзраст: {self.age} години\nЗодия: {self.star_sign}\nЕГН: {self.egn}\nАдрес: {self.address}\nТелефон: {self.phone_number}\nEmail: {self.email}\nUsername: {self.username}\nPassword: {self.password}\nWebsite: {self.website_domain}"
