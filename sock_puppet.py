@@ -7,13 +7,21 @@ from datetime import datetime, timedelta
 class SockPuppet:
     def __init__(self, gender=None):
         if gender == "random":
-            self.gender = random.choice(["male", "female"])
-        elif gender in ["male", "female"]:
-            self.gender = gender
+            self.gender = random.choice(["мъжки", "женски"])
+        else:
+            self.gender = "мъжки" if gender == "male" else "женски"
 
-        self.first_name = self.generate_first_name()
-        self.last_name = self.generate_last_name()
-        self.date_of_birth, self.bg_date_of_birth, self.age, self.star_sign = self.generate_date_of_birth()
+        self.name_info = self.generate_name_info()
+        self.cyrillic_first_name = self.name_info["cyrillic_first_name"]
+        self.cyrillic_family_name = self.name_info["cyrillic_family_name"]
+        self.latin_first_name = self.name_info["latin_first_name"]
+        self.latin_family_name = self.name_info["latin_family_name"]
+        (
+            self.date_of_birth,
+            self.bg_date_of_birth,
+            self.age,
+            self.star_sign,
+        ) = self.generate_date_of_birth()
         self.address, self.region_codes = self.generate_address()
         self.egn = self.generate_egn()
         self.phone_number = self.generate_phone_number()
@@ -22,21 +30,25 @@ class SockPuppet:
         self.password = self.generate_password()
         self.website_domain = self.generate_website_domain()
 
-    def generate_first_name(self):
-        if self.gender == "male":
-            names = self._read_strings_from_file("./lists/male_first_names.txt")
+    def generate_name_info(self):
+        if self.gender == "мъжки":
+            first_names = self._read_json_file("./lists/male_first_names.json")
+            family_names = self._read_json_file("./lists/male_family_names.json")
         else:
-            names = self._read_strings_from_file("./lists/female_first_names.txt")
+            first_names = self._read_json_file("./lists/female_first_names.json")
+            family_names = self._read_json_file("./lists/female_family_names.json")
 
-        return random.choice(names)
+        first_name = random.choice(first_names)
+        last_name = random.choice(family_names)
 
-    def generate_last_name(self):
-        if self.gender == "male":
-            names = self._read_strings_from_file("./lists/male_family_names.txt")
-        else:
-            names = self._read_strings_from_file("./lists/female_family_names.txt")
+        name_info = {
+            "cyrillic_first_name": first_name["cyrillic"],
+            "cyrillic_family_name": last_name["cyrillic"],
+            "latin_first_name": first_name["latin"],
+            "latin_family_name": last_name["latin"],
+        }
 
-        return random.choice(names)
+        return name_info
 
     def generate_date_of_birth(self):
         today = datetime.now()
@@ -46,13 +58,8 @@ class SockPuppet:
             days=random.randint(0, (latest_birth_date - earliest_birth_date).days)
         )
 
-        # Calculate age
         age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
-
-        # Calculate star sign
         star_sign = self._get_star_sign(dob.month, dob.day)
-        
-        # Format date of birth in Bulgarian format
         bg_date_of_birth = self._format_bg_date_of_birth(dob.day, dob.month, dob.year)
 
         return dob.strftime("%Y-%m-%d"), bg_date_of_birth, age, star_sign
@@ -72,7 +79,7 @@ class SockPuppet:
         region_start, region_end = self.region_codes
 
         while True:
-            if self.gender == "male":
+            if self.gender == "мъжки":
                 possible_region_codes = [
                     x for x in range(region_start, region_end) if x % 2 == 0
                 ]  # Even numbers for male
@@ -127,25 +134,84 @@ class SockPuppet:
             ]
         )
 
-        return f"{self.first_name.lower()}.{self.last_name.lower()}@{domain}"
+        first_name_components = [
+            self.latin_first_name.lower(),
+            self.latin_first_name.lower()[0],
+            self.latin_first_name.lower()[:3],
+        ]
+        last_name_components = [
+            self.latin_family_name.lower(),
+            self.latin_family_name.lower()[0],
+            self.latin_family_name.lower()[:3],
+        ]
+        year_components = [self.bg_date_of_birth[-4:], self.bg_date_of_birth[-2:]]
+
+        first_name_component = random.choice(first_name_components)
+        last_name_component = random.choice(last_name_components)
+        year_component = random.choice(year_components)
+
+        separators = ["_", "-", ".", ""]
+        separator = random.choice(separators)
+
+        name_choices = [
+            f"{first_name_component}{last_name_component}{year_component}",
+            f"{first_name_component}{separator}{last_name_component}",
+            f"{last_name_component}{year_component}",
+            f"{first_name_component}{last_name_component}",
+        ]
+        name_choice = random.choice(name_choices)
+
+        return f"{name_choice}@{domain}"
 
     def generate_username(self):
-        return f"{self.first_name.lower()}.{self.last_name.lower()}_{random.randint(100, 999)}"
+        first_name_components = [
+            self.latin_first_name.lower(),
+            self.latin_first_name.lower()[0],
+            self.latin_first_name.lower()[:3],
+        ]
+        last_name_components = [
+            self.latin_family_name.lower(),
+            self.latin_family_name.lower()[0],
+            self.latin_family_name.lower()[:3],
+        ]
+        year_components = [self.bg_date_of_birth[-4:], self.bg_date_of_birth[-2:]]
+
+        first_name_component = random.choice(first_name_components)
+        last_name_component = random.choice(last_name_components)
+        year_component = random.choice(year_components)
+
+        separators = ["_", "-", ".", ""]
+        separator = random.choice(separators)
+
+        components_order = [first_name_component, last_name_component, year_component]
+        random.shuffle(components_order)
+
+        username_parts = []
+
+        for component in components_order:
+            username_parts.append(component)
+
+            if len(username_parts) < 3:
+                username_parts.append(separator)
+
+        username = "".join(username_parts)
+
+        return username
 
     def generate_password(self):
         characters = string.ascii_letters + string.digits + string.punctuation
 
-        return "".join(random.choices(characters, k=8))
+        return "".join(random.choices(characters, k=16))
 
     def generate_website_domain(self):
-        return f"www.{random.choice(['example', 'test', 'demo'])}.{random.choice(['bg', 'eu', 'io', 'fun', 'store', 'com', 'net', 'org'])}"
+        return f"www.{random.choice([self.latin_first_name.lower(), self.latin_family_name.lower(), self.latin_first_name.lower() + self.latin_family_name.lower(), self.latin_family_name.lower() + self.bg_date_of_birth[-2:]])}.{random.choice(['bg', 'eu', 'io', 'fun', 'store', 'com', 'net', 'org'])}"
 
     def _validate_egn(self, egn):
         egn_weights = (2, 4, 8, 5, 10, 9, 7, 3, 6)
         egn_sum = sum([weight * int(digit) for weight, digit in zip(egn_weights, egn)])
 
         return int(egn[-1]) == egn_sum % 11 % 10
-    
+
     def _format_bg_date_of_birth(self, day, month, year):
         bg_month_names = {
             1: "януари",
@@ -162,7 +228,7 @@ class SockPuppet:
             12: "декември",
         }
 
-        bg_date = f"{day} {bg_month_names[month]} {year}г."
+        bg_date = f"{day} {bg_month_names[month]} {year}"
 
         return bg_date
 
@@ -200,4 +266,5 @@ class SockPuppet:
         return data
 
     def __str__(self):
-        return f"Име: {self.first_name} {self.last_name}\nПол: {self.gender}\nРожена дата: {self.bg_date_of_birth}\nВъзраст: {self.age} години\nЗодия: {self.star_sign}\nЕГН: {self.egn}\nАдрес: {self.address}\nТелефон: {self.phone_number}\nEmail: {self.email}\nUsername: {self.username}\nPassword: {self.password}\nWebsite: {self.website_domain}"
+        return f"Име: {self.cyrillic_first_name} {self.cyrillic_family_name}\nПол: {self.gender}\nДата на раждане: {self.bg_date_of_birth}г.\nВъзраст: {self.age} години\nЗодия: {self.star_sign}\nЕГН: {self.egn}\nАдрес: {self.address}\nТелефон: {self.phone_number}\nEmail: {self.email}\nUsername: {self.username}\nPassword: {self.password}\nWebsite: {self.website_domain}"
+
