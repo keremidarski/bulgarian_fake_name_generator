@@ -13,7 +13,7 @@ class SockPuppet:
 
         self.first_name = self.generate_first_name()
         self.last_name = self.generate_last_name()
-        self.date_of_birth = self.generate_date_of_birth()
+        self.date_of_birth, self.age, self.star_sign = self.generate_date_of_birth()
         self.egn = self.generate_egn()
         self.address, self.region = self.generate_address()
         self.phone_number = self.generate_phone_number()
@@ -46,16 +46,27 @@ class SockPuppet:
             days=random.randint(0, (latest_birth_date - earliest_birth_date).days)
         )
 
-        return dob.strftime("%Y-%m-%d")
+        # Calculate age
+        age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+
+        # Calculate star sign
+        star_sign = self._get_star_sign(dob.month, dob.day)
+
+        return dob.strftime("%Y-%m-%d"), age, star_sign
 
     def generate_egn(self):
-        year = self.date_of_birth[:4][-2:]
-        month = self.date_of_birth[5:7]
-        day = self.date_of_birth[8:10]
-        birthday = f"{year}{month}{day}"
+        if int(self.date_of_birth[:4]) >= 2000:
+            year = self.date_of_birth[:4][-2:]
+            month = int(self.date_of_birth[5:7]) + 40
+            day = self.date_of_birth[8:10]
+            birthday = f"{year}{month:02d}{day}"
+        else:
+            year = self.date_of_birth[:4][-2:]
+            month = self.date_of_birth[5:7]
+            day = self.date_of_birth[8:10]
+            birthday = f"{year}{month}{day}"
 
         region_start, region_end = self.region_codes
-        region_range = range(region_start, region_end)
 
         while True:
             if self.gender == "male":
@@ -76,21 +87,19 @@ class SockPuppet:
                 if self._validate_egn(egn):
                     return egn
 
-        return egn
-
     def generate_address(self):
         cities = self._read_json_file("./lists/cities.json")
         city = random.choice(cities)
 
         city_name = city["name"]
         region_codes = city["codes"]
-        
-        streets = self._read_strings_from_file("./lists/streets.txt")
+
+        streets = self._read_strings_from_file("./lists/street_names.txt")
         street = random.choice(streets)
-        street_number = random.randint(1, 1000)
+        street_number = random.randint(1, 300)
 
         return (
-            f"{city}, {street} {street_number}",
+            f"{city_name}, {street} {street_number}",
             region_codes,
         )
 
@@ -104,7 +113,15 @@ class SockPuppet:
 
     def generate_email(self):
         domain = random.choice(
-            ["abv.bg", "mail.bg", "gmail.com", "yahoo.com", "hotmail.com"]
+            [
+                "abv.bg",
+                "mail.bg",
+                "dir.bg",
+                "outlook.bg",
+                "gmail.com",
+                "yahoo.com",
+                "hotmail.com",
+            ]
         )
 
         return f"{self.first_name.lower()}.{self.last_name.lower()}@{domain}"
@@ -114,7 +131,7 @@ class SockPuppet:
 
     def generate_password(self):
         characters = string.ascii_letters + string.digits + string.punctuation
-        
+
         return "".join(random.choices(characters, k=8))
 
     def generate_website_domain(self):
@@ -123,9 +140,32 @@ class SockPuppet:
     def _validate_egn(self, egn):
         egn_weights = (2, 4, 8, 5, 10, 9, 7, 3, 6)
         egn_sum = sum([weight * int(digit) for weight, digit in zip(egn_weights, egn)])
-        
+
         return int(egn[-1]) == egn_sum % 11 % 10
-    
+
+    def _get_star_sign(self, month, day):
+        # Define star signs and their corresponding dates
+        star_signs = [
+            ("Козирог", (1, 1), (1, 19)),
+            ("Водолей", (1, 20), (2, 18)),
+            ("Риби", (2, 19), (3, 20)),
+            ("Овен", (3, 21), (4, 19)),
+            ("Телец", (4, 20), (5, 20)),
+            ("Близнаци", (5, 21), (6, 20)),
+            ("Рак", (6, 21), (7, 22)),
+            ("Лъв", (7, 23), (8, 22)),
+            ("Дева", (8, 23), (9, 22)),
+            ("Везни", (9, 23), (10, 22)),
+            ("Скорпион", (10, 23), (11, 21)),
+            ("Стрелец", (11, 22), (12, 21)),
+            ("Козирог", (12, 22), (12, 31)),
+        ]
+
+        # Iterate through star signs to find the matching one
+        for sign, start_date, end_date in star_signs:
+            if (month, day) >= start_date and (month, day) <= end_date:
+                return sign
+
     def _read_strings_from_file(self, filename):
         with open(filename, "r") as file:
             strings = file.read().splitlines()
@@ -135,8 +175,8 @@ class SockPuppet:
     def _read_json_file(self, filename):
         with open(filename, "r") as file:
             data = json.load(file)
-            
+
         return data
 
     def __str__(self):
-        return f"Name: {self.first_name} {self.last_name}\nGender: {self.gender}\nDate of Birth: {self.date_of_birth}\nEGN: {self.egn}\nAddress: {self.address}\nPhone Number: {self.phone_number}\nEmail: {self.email}\nUsername: {self.username}\nPassword: {self.password}\nWebsite Domain: {self.website_domain}"
+        return f"Name: {self.first_name} {self.last_name}\nGender: {self.gender}\nDate of Birth: {self.date_of_birth}\nAge: {self.age}\nStar Sign: {self.star_sign}\nEGN: {self.egn}\nAddress: {self.address}\nPhone Number: {self.phone_number}\nEmail: {self.email}\nUsername: {self.username}\nPassword: {self.password}\nWebsite Domain: {self.website_domain}"
