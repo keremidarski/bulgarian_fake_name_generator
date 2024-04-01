@@ -3,11 +3,22 @@
 The Bulgarian Sock Puppet Generator is a tool for generating realistic fake identities, a.k.a. sock puppets, tailored specifically for Bulgaria. It generates random personas with authentic Bulgarian names, addresses, phone numbers, email addresses, and more.
 
 ### Features
-* **Localized Data**: Utilizes data specific to Bulgaria, including names, cities, street names, valid Bulgarian unified civil number (EGN), phone numbers, and more, to generate realistic personas.
-* **Customizable Gender**: Allows users to specify the gender of the generated personas (male, female, or random).
-* **Comprehensive Details**: Generates a wide range of personal details, including names, addresses, phone numbers, email addresses, usernames, passwords, website domains, date of birth, and Bulgarian unified civil number (EGN).
-* **Randomization**: Incorporates randomization to ensure unique and diverse personas with each generation.
-* **Easy Integration**: Simple Python class structure allows for easy integration into other projects or systems.
+![image](https://github.com/keremidarski/bulgarian_sock_puppet/assets/12044844/59df640e-f84f-490e-b005-22c9ce37318c)
+* Generates a random **name** with Cyrillic and Latin representations.
+* Provides a randomly generated **photo URL** based on the puppet's gender.
+* Generates a random **date of birth** and calculates the **age** and **zodiac sign**.
+* Generates a random **address** with a **street name**, **street number**, **city**, and **region**.
+* Generates a **valid Bulgarian personal identification number (EGN)** based on the puppet's gender and date of birth, **passing official validation**.
+
+![image](https://github.com/keremidarski/bulgarian_sock_puppet/assets/12044844/425fccdb-c2b9-4c85-bece-aca1f64e8303)
+* Generates a random **Bulgarian phone number**.
+* Generates a random **credit card number** with a **valid checksum**, formatted as XXXX XXXX XXXX XXXX, **passing the MOD 10 check (Luhn formula)**.
+
+![318520838-7c0117b9-21d0-4239-bc44-f4a3807fec2d (1)](https://github.com/keremidarski/bulgarian_sock_puppet/assets/12044844/032fa602-0dc2-4bb2-a241-1d73e007f0d3)
+* Generates a random **email address** based on the puppet's name, birth year, and a random domain.
+* Generates a random **username** based on the puppet's name and birth year, with random separators.
+* Generates a random **password** with 16 characters, including letters, digits, and punctuation marks.
+* Generates a random **website domain** based on the puppet's name and birth year, with a random top-level domain.
 
 ### Future improvements
 * **Random Fake Photo**: I want to add an integration with a fake person generator API so I can generate a photo to match the fake persona.
