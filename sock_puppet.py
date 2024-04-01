@@ -1,4 +1,5 @@
 import json
+import copy
 import random
 import string
 from datetime import datetime, timedelta
@@ -16,15 +17,23 @@ class SockPuppet:
         self.cyrillic_family_name = self.name_info["cyrillic_family_name"]
         self.latin_first_name = self.name_info["latin_first_name"]
         self.latin_family_name = self.name_info["latin_family_name"]
-        (
-            self.date_of_birth,
-            self.bg_date_of_birth,
-            self.age,
-            self.star_sign,
-        ) = self.generate_date_of_birth()
+
+        self.photo = self.generate_photo()
+
+        self.dob, self.age = self.generate_date_of_birth()
+        self.bg_date_of_birth = self._format_bg_date_of_birth(
+            self.dob.day, self.dob.month, self.dob.year
+        )
+        self.star_sign = self._get_star_sign(self.dob.month, self.dob.day)
+
         self.address, self.region_codes = self.generate_address()
         self.egn = self.generate_egn()
         self.phone_number = self.generate_phone_number()
+
+        self._generator = random.Random()
+        self._generator.seed()
+        self._credit_card = self.generate_credit_card_number()
+
         self.email = self.generate_email()
         self.username = self.generate_username()
         self.password = self.generate_password()
@@ -50,6 +59,12 @@ class SockPuppet:
 
         return name_info
 
+    def generate_photo(self):
+        if self.gender == "мъжки":
+            return "https://xsgames.co/randomusers/avatar.php?g=male"
+        else:
+            return "https://xsgames.co/randomusers/avatar.php?g=female"
+
     def generate_date_of_birth(self):
         today = datetime.now()
         earliest_birth_date = today - timedelta(days=70 * 365)
@@ -59,21 +74,21 @@ class SockPuppet:
         )
 
         age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
-        star_sign = self._get_star_sign(dob.month, dob.day)
-        bg_date_of_birth = self._format_bg_date_of_birth(dob.day, dob.month, dob.year)
 
-        return dob.strftime("%Y-%m-%d"), bg_date_of_birth, age, star_sign
+        return dob, age
 
     def generate_egn(self):
-        if int(self.date_of_birth[:4]) >= 2000:
-            year = self.date_of_birth[:4][-2:]
-            month = int(self.date_of_birth[5:7]) + 40
-            day = self.date_of_birth[8:10]
+        dob_to_parse = self.dob.strftime("%Y-%m-%d")
+
+        if int(dob_to_parse[:4]) >= 2000:
+            year = dob_to_parse[:4][-2:]
+            month = int(dob_to_parse[5:7]) + 40
+            day = dob_to_parse[8:10]
             birthday = f"{year}{month:02d}{day}"
         else:
-            year = self.date_of_birth[:4][-2:]
-            month = self.date_of_birth[5:7]
-            day = self.date_of_birth[8:10]
+            year = dob_to_parse[:4][-2:]
+            month = dob_to_parse[5:7]
+            day = dob_to_parse[8:10]
             birthday = f"{year}{month}{day}"
 
         region_start, region_end = self.region_codes
@@ -106,20 +121,67 @@ class SockPuppet:
 
         streets = self._read_strings_from_file("./lists/street_names.txt")
         street = random.choice(streets)
-        street_number = random.randint(1, 300)
+        street_number = random.randint(1, 130)
 
         return (
-            f"{city_name}, {street} {street_number}",
+            f"{city_name}, ул. {street} {street_number}",
             region_codes,
         )
 
     def generate_phone_number(self):
-        prefix = random.choice(["087", "088", "089"])
-        fourth_digit = random.choice(string.digits)
+        prefix = random.choice(
+            [
+                "0877",
+                "0878",
+                "0879",
+                "0882",
+                "0883",
+                "0884",
+                "0885",
+                "0886",
+                "0887",
+                "0888",
+                "0889",
+                "0892",
+                "0893",
+                "0894",
+                "0895",
+                "0896",
+                "0897",
+                "0898",
+                "0899",
+            ]
+        )
         middle_part = "".join(random.choices(string.digits, k=3))
         last_part = "".join(random.choices(string.digits, k=3))
 
-        return f"{prefix}{fourth_digit} {middle_part} {last_part}"
+        return f"{prefix} {middle_part} {last_part}"
+
+    def generate_credit_card_number(self):
+        visa_prefix_list = [
+            ["4", "5", "3", "9"],
+            ["4", "5", "5", "6"],
+            ["4", "9", "1", "6"],
+            ["4", "5", "3", "2"],
+            ["4", "9", "2", "9"],
+            ["4", "0", "2", "4", "0", "0", "7", "1"],
+            ["4", "4", "8", "6"],
+            ["4", "7", "1", "6"],
+            ["4"],
+        ]
+
+        mastercard_prefix_list = [
+            ["5", "1"],
+            ["5", "2"],
+            ["5", "3"],
+            ["5", "4"],
+            ["5", "5"],
+        ]
+
+        if random.choice([True, False]):
+            return self._credit_card_number(visa_prefix_list, 16)
+        else:
+            return self._credit_card_number(mastercard_prefix_list, 16)
 
     def generate_email(self):
         domain = random.choice(
@@ -253,6 +315,48 @@ class SockPuppet:
             if (month, day) >= start_date and (month, day) <= end_date:
                 return sign
 
+    def _completed_number(self, prefix, length):
+        ccnumber = prefix
+
+        while len(ccnumber) < (length - 1):
+            digit = str(self._generator.choice(range(0, 10)))
+            ccnumber.append(digit)
+
+        sum = 0
+        pos = 0
+
+        reversedCCnumber = []
+        reversedCCnumber.extend(ccnumber)
+        reversedCCnumber.reverse()
+
+        while pos < length - 1:
+            odd = int(reversedCCnumber[pos]) * 2
+            if odd > 9:
+                odd -= 9
+            sum += odd
+
+            if pos != (length - 2):
+                sum += int(reversedCCnumber[pos + 1])
+
+            pos += 2
+
+        checkdigit = ((sum // 10 + 1) * 10 - sum) % 10
+
+        ccnumber.append(str(checkdigit))
+
+        cc_number_str = "".join(ccnumber)
+
+        # Format the credit card number with spaces after every four digits
+        formatted_cc_number = " ".join(
+            cc_number_str[i : i + 4] for i in range(0, len(cc_number_str), 4)
+        )
+
+        return formatted_cc_number
+
+    def _credit_card_number(self, prefix_list, length):
+        ccnumber = copy.copy(self._generator.choice(prefix_list))
+        return self._completed_number(ccnumber, length)
+
     def _read_strings_from_file(self, filename):
         with open(filename, "r", encoding="utf8") as file:
             strings = file.read().splitlines()
@@ -266,5 +370,4 @@ class SockPuppet:
         return data
 
     def __str__(self):
-        return f"Име: {self.cyrillic_first_name} {self.cyrillic_family_name}\nПол: {self.gender}\nДата на раждане: {self.bg_date_of_birth}г.\nВъзраст: {self.age} години\nЗодия: {self.star_sign}\nЕГН: {self.egn}\nАдрес: {self.address}\nТелефон: {self.phone_number}\nEmail: {self.email}\nUsername: {self.username}\nPassword: {self.password}\nWebsite: {self.website_domain}"
-
+        return f"Име: {self.cyrillic_first_name} {self.cyrillic_family_name}\nПол: {self.gender}\nДата на раждане: {self.bg_date_of_birth}г.\nВъзраст: {self.age} години\nЗодия: {self.star_sign}\nЕГН: {self.egn}\nАдрес: {self.address}\nТелефон: {self.phone_number}\nБанкова карта: {self._credit_card}\nEmail: {self.email}\nUsername: {self.username}\nPassword: {self.password}\nWebsite: {self.website_domain}"
