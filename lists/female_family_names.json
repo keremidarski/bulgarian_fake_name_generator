@@ -68,10 +68,6 @@
         "latin": "Arnaudova"
     },
     {
-        "cyrillic": "Арнаудоваа",
-        "latin": "Arnaudovaa"
-    },
-    {
         "cyrillic": "Арсенова",
         "latin": "Arsenova"
     },
@@ -416,10 +412,6 @@
         "latin": "Georgieva"
     },
     {
-        "cyrillic": "Георгиеваа",
-        "latin": "Georgievaa"
-    },
-    {
         "cyrillic": "Герасимова",
         "latin": "Gerasimova"
     },
@@ -582,10 +574,6 @@
     {
         "cyrillic": "Димитрова",
         "latin": "Dimitrova"
-    },
-    {
-        "cyrillic": "Димитроваа",
-        "latin": "Dimitrovaa"
     },
     {
         "cyrillic": "Димкова",
@@ -784,8 +772,8 @@
         "latin": "Zlatanova"
     },
     {
-        "cyrillic": "Златареваа",
-        "latin": "Zlatarevaa"
+        "cyrillic": "Златарева",
+        "latin": "Zlatareva"
     },
     {
         "cyrillic": "Златарска",
@@ -806,10 +794,6 @@
     {
         "cyrillic": "Иванова",
         "latin": "Ivanova"
-    },
-    {
-        "cyrillic": "Ивановаа",
-        "latin": "Ivanovaa"
     },
     {
         "cyrillic": "Ивкова",
@@ -1348,10 +1332,6 @@
         "latin": "Mihaylova"
     },
     {
-        "cyrillic": "Михайловаа",
-        "latin": "Mihaylovaa"
-    },
-    {
         "cyrillic": "Михайловска",
         "latin": "Mihaylovska"
     },
@@ -1846,10 +1826,6 @@
     {
         "cyrillic": "Тасева",
         "latin": "Taseva"
-    },
-    {
-        "cyrillic": "Тасеваа",
-        "latin": "Tasevaa"
     },
     {
         "cyrillic": "Таскова",
