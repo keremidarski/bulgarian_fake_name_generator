@@ -20,6 +20,16 @@ The Bulgarian Sock Puppet Generator is a tool for generating realistic fake iden
 * Generates a random **password** with 16 characters, including letters, digits, and punctuation marks.
 * Generates a random **website domain** based on the puppet's name and birth year, with a random top-level domain.
 
+### Instalation & Usage
+1. Install prerequisites:
+  ```bash
+  pip install -r requirements.txt
+  ```
+2. Generate a sock puppet:
+  ```bash
+  python3 -m sock_puppet.py
+  ```
+
 ### Future improvements
 * **Random Fake Photo**: I want to add an integration with a fake person generator API so I can generate a photo to match the fake persona.
 * **Improved Addresses**: Right now the addresses are a randomly generated combination of cities, streets and numbers but I want to improve the dataset so it can generate real addresses.
