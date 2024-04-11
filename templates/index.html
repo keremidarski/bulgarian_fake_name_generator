@@ -4,38 +4,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fake Person Generator</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>Bulgarian Sock Puppet Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Custom CSS for centering photo frame */
+        #photoFrameContainer {
+            display: flex;
+            justify-content: center;
+        }
+
+        #photoFrame {
+            width: 256px;
+            height: 256px;
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
 </head>
 
 <body class="bg-gray-100">
     <div class="container mx-auto py-8">
-        <div class="max-w-md mx-auto bg-white p-8 border rounded shadow-md">
-            <h1 class="text-2xl font-bold mb-4">Fake Person Generator</h1>
-            <form action="/generate" method="post">
-                <div class="mb-4">
-                    <label for="gender" class="block text-sm font-medium text-gray-700">Gender:</label>
-                    <select name="gender" id="gender"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                        <option value="random">Random</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                    </select>
+        <h1 class="text-2xl font-bold text-center mb-4">Bulgarian Sock Puppet Generator</h1>
+        <div class="flex justify-center">
+            <div id="puppetInfo"
+                class="max-w-md w-full mx-4 bg-white p-8 border rounded shadow-md grid grid-cols-2 gap-4 text-left">
+                <!-- Card for puppet information -->
+                <div id="photoFrameContainer" class="col-span-2">
+                    <div class="w-64 h-64 bg-cover bg-center mb-4" id="photoFrame"></div>
                 </div>
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Generate
-                </button>
-            </form>
-
-            {% if puppet %}
-            <div class="mt-8">
-                <h2 class="text-lg font-bold mb-2">Generated Fake Person:</h2>
-                <p>{{ puppet }}</p>
+                <div class="col-span-2"><strong>Име: </strong><span id="cyrillicFirstName"></span> <span
+                        id="cyrillicFamilyName"></span></div>
+                <div class="col-span-2"><strong>Пол: </strong><span id="gender"></span></div>
+                <div class="col-span-2"><strong>Дата на раждане: </strong><span id="dob"></span></div>
+                <div class="col-span-2"><strong>Възраст: </strong><span id="age"></span> години</div>
+                <div class="col-span-2"><strong>Зодия: </strong><span id="starSign"></span></div>
+                <div class="col-span-2"><strong>ЕГН: </strong><span id="egn"></span></div>
+                <div class="col-span-2"><strong>Адрес: </strong><span id="address"></span></div>
+                <div class="col-span-2"><strong>Телефон: </strong><span id="phoneNumber"></span></div>
+                <div class="col-span-2"><strong>Банкова карта: </strong><span id="creditCard"></span></div>
+                <div class="col-span-2"><strong>Email: </strong><span id="email"></span></div>
+                <div class="col-span-2"><strong>Username: </strong><span id="username"></span></div>
+                <div class="col-span-2"><strong>Password: </strong><span id="password"></span></div>
+                <div class="col-span-2"><strong>Website: </strong><span id="websiteDomain"></span></div>
             </div>
-            {% endif %}
         </div>
     </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 
 </html>
