@@ -203,7 +203,6 @@ class SockPuppet:
         ]
         last_name_components = [
             self.latin_family_name.lower(),
-            self.latin_family_name.lower()[0],
             self.latin_family_name.lower()[:3],
         ]
         year_components = [self.bg_date_of_birth[-4:], self.bg_date_of_birth[-2:]]
@@ -371,3 +370,8 @@ class SockPuppet:
 
     def __str__(self):
         return f"Име: {self.cyrillic_first_name} {self.cyrillic_family_name}\nПол: {self.gender}\nДата на раждане: {self.bg_date_of_birth}г.\nВъзраст: {self.age} години\nЗодия: {self.star_sign}\nЕГН: {self.egn}\nАдрес: {self.address}\nТелефон: {self.phone_number}\nБанкова карта: {self._credit_card}\nEmail: {self.email}\nUsername: {self.username}\nPassword: {self.password}\nWebsite: {self.website_domain}"
+
+
+if __name__ == "__main__":
+    puppet1 = SockPuppet("random")
+    print(puppet1)
